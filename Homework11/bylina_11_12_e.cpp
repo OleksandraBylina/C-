@@ -15,11 +15,7 @@ struct Toy {
 
 void file_opener(const char* filename, Toy* toys_list, int* size) {
     FILE* f = fopen(filename, "rb");
-    if (f == nullptr) {
-        cerr << "Ошибка открытия файла!" << endl;
-        *size = 0;
-        return;
-    }
+
 
     int i = 0;
     while (fread(&toys_list[i], sizeof(Toy), 1, f) == 1) {
