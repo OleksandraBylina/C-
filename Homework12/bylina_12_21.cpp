@@ -18,7 +18,7 @@ bool isEarlier(int d1, int m1, int y1, int d2, int m2, int y2) {
 void printFileToConsole(const string &fileName) {
     ifstream file(fileName);
     string line;
-    cout << "Содержимое файла " << fileName << ":" << endl;
+    cout << "Файл " << fileName << ":" << endl;
     while (getline(file, line)) {
         cout << line << endl;
     }
