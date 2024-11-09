@@ -1,3 +1,8 @@
+
+
+//
+// Created by bylin on 09.11.2024.
+//
 #include <iostream>
 #include <cmath>
 #include <stdexcept>
@@ -16,7 +21,7 @@ public:
     friend istream& operator>>(istream& is, Complex& z);
 
 
-    double modul() const {
+    double modulus() const {
         return sqrt(real * real + imag * imag);
     }
 
@@ -53,15 +58,15 @@ public:
 
 
     Complex arctan_series_sum(double epsilon) const {
-        if (this->modul() >= 1) {
-            throw logic_error("Division by zero");
+        if (this->modulus() >= 1) {
+            throw logic_error("The modulus of the complex number must be less than 1 to sum the series.");
         }
         Complex sum(0, 0);
         Complex term(*this);
         int n = 1;
-        while (term.modul() > epsilon) {
-            if (n % 2 == 0) term = term * -1;
-            sum = sum + term / n;
+        while (term.modulus() > epsilon) {
+            if (n % 2 == 0) term = term * Complex(-1, 0);
+            sum = sum + (term / Complex(n, 0));
             term = term * (*this) * (*this);
             n += 2;
         }
@@ -74,25 +79,26 @@ public:
             double* array = new double[size];
             delete[] array;
         } catch (const bad_alloc&) {
-            throw runtime_error("Memory leaked");
+            throw runtime_error("Memory allocation failed");
         }
     }
 };
 
 ostream& operator<<(ostream& os, const Complex& z) {
-    os << z.real << " + " << z.imag << "i";
+    os << z.real;
+    if (z.imag >= 0) os << " + " << z.imag << "i";
+    else os << " - " << -z.imag << "i";
     return os;
 }
 
-
 istream& operator>>(istream& is, Complex& z) {
-    cout << "Write Re-part:";
-    if (!(is >> z.real)) {
-        throw invalid_argument("Incorrect");
+    char op, i_char;
+    cout << "Enter a complex number in the format a + bi:\n";
+    if (!(is >> z.real >> op >> z.imag >> i_char) || (op != '+' && op != '-') || i_char != 'i') {
+        throw invalid_argument("Invalid input format. Expected format a + bi.");
     }
-    cout << "Write Im-part: ";
-    if (!(is >> z.imag)) {
-        throw invalid_argument("Incorrect");
+    if (op == '-') {
+        z.imag = -z.imag;
     }
     return is;
 }
@@ -100,21 +106,22 @@ istream& operator>>(istream& is, Complex& z) {
 int main() {
     try {
         Complex z;
-        cout << "Write a number";
         cin >> z;
-        if (z.modul() >= 1) {
-            throw logic_error("Incorrect");
-        }
-
 
         z.allocateMemory(1000);
 
         double epsilon = 0.00001;
         Complex result = z.arctan_series_sum(epsilon);
-        cout << "Sum: " << result << endl;
+        cout << "Series Sum: " << result << endl;
 
-    } catch (const exception& e) {
-        cerr << "Error" << e.what() << endl;
+    } catch (const invalid_argument& e) {
+        cerr << "Input Error: " << e.what() << endl;
+    }
+    catch (const logic_error& e) {
+        cerr << "Logical Error: " << e.what() << endl;
+    }
+    catch (const exception& e) {
+        cerr << "Error: " << e.what() << endl;
     }
 
     return 0;
